@@ -1,13 +1,8 @@
 ---
 title: "Statistics Dashboard: HIV Deaths and Medical Doctors"
 author: "Charles O"
-format: 
-    html: 
-        layout: dashboard
-        theme: superhero
-        code-fold: true
-        page-layout: full
-        self-contained: true
+format: dashboard
+theme: superhero
 
     
 ---
