@@ -256,7 +256,9 @@ scatter_one = sns.scatterplot(
 )
 
 # Set plot title and labels
-scatter_one.set_title("Relationship between Medical Doctors and HIV Deaths", fontsize=16)
+scatter_one.set_title(
+    "Relationship between Medical Doctors and HIV Deaths", fontsize=16
+)
 scatter_one.set_xlabel("Doctors per 1000 People", fontsize=12)
 scatter_one.set_ylabel("HIV Deaths", fontsize=12)
 

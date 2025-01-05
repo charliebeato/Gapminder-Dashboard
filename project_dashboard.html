@@ -3126,7 +3126,7 @@ vertical-align: -.125em;
 <li>Relationship Between the Two Indicators.</li>
 </ol>
 <hr>
-<div id="f37209d8" class="cell" data-execution_count="1">
+<div id="3773db36" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load libraries</span></span>
@@ -3143,7 +3143,7 @@ vertical-align: -.125em;
 <li><p><strong>Annual HIV Deaths Dataset:</strong> This dataset provides the annual number of deaths attributable to HIV/AIDS</p></li>
 <li><p><strong>Medical Doctors per 1,000 People:</strong> This dataset measures the number of medical doctors per 1,000 people, representing healthcare resource availability at national or subnational levels</p></li>
 </ol>
-<div id="3f1f7d3b" class="cell" data-execution_count="2">
+<div id="049cae14" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load raw data </span></span>
@@ -3151,7 +3151,7 @@ vertical-align: -.125em;
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>medical_doctors_raw <span class="op">=</span> pd.read_csv(<span class="st">&quot;data/medical_doctors_per_1000_people.csv&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="feece3eb" class="cell" data-execution_count="3">
+<div id="febd1ea6" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># converting to log format</span></span>
@@ -3163,7 +3163,7 @@ vertical-align: -.125em;
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="1b876d2e" class="cell" data-execution_count="4">
+<div id="ee3458b0" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>medical_doctors_raw_wide <span class="op">=</span> medical_doctors_raw</span>
@@ -3175,7 +3175,7 @@ vertical-align: -.125em;
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>medical_doctors_long[<span class="st">&#39;number_of_doctors&#39;</span>] <span class="op">=</span> medical_doctors_long[<span class="st">&#39;doctors_per_1000&#39;</span>] <span class="op">*</span> <span class="dv">1000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="dcb4ad16" class="cell" data-execution_count="5">
+<div id="4f456c56" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert non-numeric values in &#39;hiv_deaths&#39; to numeric (e.g., &#39;11k&#39; to 11000)</span></span>
@@ -3187,7 +3187,7 @@ vertical-align: -.125em;
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="ee09e7e7" class="cell" data-execution_count="6">
+<div id="66a3ab3f" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Convert year to integer and clean numeric columns</span></span>
@@ -3195,7 +3195,7 @@ vertical-align: -.125em;
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>medical_doctors_long[<span class="st">&#39;year&#39;</span>] <span class="op">=</span> pd.to_numeric(medical_doctors_long[<span class="st">&#39;year&#39;</span>], errors<span class="op">=</span><span class="st">&#39;coerce&#39;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="3dddaad5" class="cell" data-execution_count="7">
+<div id="aa3bfb07" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 3: Align datasets by filtering overlapping years</span></span>
@@ -3204,21 +3204,21 @@ vertical-align: -.125em;
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>medical_doctors_long <span class="op">=</span> medical_doctors_long[medical_doctors_long[<span class="st">&#39;year&#39;</span>].isin(common_years)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="2b4881b3" class="cell" data-execution_count="8">
+<div id="79e8bebf" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 4: Merge datasets on &#39;country&#39; and &#39;year&#39;</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>merged_data <span class="op">=</span> pd.merge(hiv_deaths_long, medical_doctors_long, on<span class="op">=</span>[<span class="st">&quot;country&quot;</span>, <span class="st">&quot;year&quot;</span>], how<span class="op">=</span><span class="st">&quot;inner&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="b1bfa994" class="cell" data-execution_count="9">
+<div id="dc9e8184" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 5: Drop duplicates and save the cleaned dataset</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>merged_data <span class="op">=</span> merged_data.drop_duplicates()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="1370e753" class="cell" data-execution_count="10">
+<div id="1dc1ef51" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save to a CSV file</span></span>
@@ -3232,7 +3232,7 @@ vertical-align: -.125em;
 <h1>Annual HIV Deaths</h1>
 <section id="section" class="level2" height="50%">
 <h2 height="50%" class="anchored" data-anchor-id="section"></h2>
-<div id="cec40c1c" class="cell" data-execution_count="11">
+<div id="d776a9cf" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Value box for country with highest HIV deaths in the most recent year</span></span>
@@ -3251,7 +3251,7 @@ vertical-align: -.125em;
 </section>
 <section id="section-2" class="level3" width="100%">
 <h3 width="100%" class="anchored" data-anchor-id="section-2"></h3>
-<div id="8daa7977" class="cell" data-execution_count="12">
+<div id="51133f5d" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Table summarizing statistics for the most recent year</span></span>
@@ -3331,7 +3331,7 @@ vertical-align: -.125em;
 </section>
 <section id="trends-in-annual-hiv-deaths" class="level2" height="50%">
 <h2 height="50%" class="anchored" data-anchor-id="trends-in-annual-hiv-deaths">Trends in Annual HIV Deaths</h2>
-<div id="19c6f936" class="cell" data-execution_count="13">
+<div id="8cbaf0b6" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aggregate data for the line chart</span></span>
@@ -3360,7 +3360,7 @@ vertical-align: -.125em;
 <h1>Medical Doctors per 1000 People</h1>
 <section id="top-10-countries-by-doctors-per-1000-people" class="level2">
 <h2 class="anchored" data-anchor-id="top-10-countries-by-doctors-per-1000-people">Top 10 Countries by Doctors per 1000 People</h2>
-<div id="a8f08663" class="cell" data-execution_count="14">
+<div id="22d4aacf" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aggregate data for a specific year (2011))</span></span>
@@ -3390,7 +3390,7 @@ vertical-align: -.125em;
 </section>
 <section id="heatmap-for-5-countries-by-doctors-per-1000-people" class="level2">
 <h2 class="anchored" data-anchor-id="heatmap-for-5-countries-by-doctors-per-1000-people">Heatmap for 5 Countries by Doctors per 1000 People</h2>
-<div id="384cc886" class="cell" data-execution_count="15">
+<div id="1268a456" class="cell" data-execution_count="15">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select 5 countries from 5 continents</span></span>
@@ -3441,7 +3441,7 @@ vertical-align: -.125em;
 </section>
 <section id="relationship-between-hiv-deaths-and-medical-doctors" class="level1">
 <h1>Relationship Between HIV Deaths and Medical Doctors</h1>
-<div id="511b4c66" class="cell" data-execution_count="16">
+<div id="e5d11f4a" class="cell" data-execution_count="16">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
@@ -3457,15 +3457,17 @@ vertical-align: -.125em;
 <span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Set plot title and labels</span></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>scatter_one.set_title(<span class="st">&quot;Relationship between Medical Doctors and HIV Deaths&quot;</span>, fontsize<span class="op">=</span><span class="dv">16</span>)</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>scatter_one.set_xlabel(<span class="st">&quot;Doctors per 1000 People&quot;</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>scatter_one.set_ylabel(<span class="st">&quot;HIV Deaths&quot;</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjust legend position</span></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>scatter_one.legend(title<span class="op">=</span><span class="st">&quot;Year&quot;</span>, bbox_to_anchor<span class="op">=</span>(<span class="fl">1.05</span>, <span class="dv">1</span>), loc<span class="op">=</span><span class="st">&quot;upper left&quot;</span>)</span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Enable grid for better readability</span></span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>scatter_one.grid(<span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>scatter_one.set_title(</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Relationship between Medical Doctors and HIV Deaths&quot;</span>, fontsize<span class="op">=</span><span class="dv">16</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>scatter_one.set_xlabel(<span class="st">&quot;Doctors per 1000 People&quot;</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>scatter_one.set_ylabel(<span class="st">&quot;HIV Deaths&quot;</span>, fontsize<span class="op">=</span><span class="dv">12</span>)</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Adjust legend position</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>scatter_one.legend(title<span class="op">=</span><span class="st">&quot;Year&quot;</span>, bbox_to_anchor<span class="op">=</span>(<span class="fl">1.05</span>, <span class="dv">1</span>), loc<span class="op">=</span><span class="st">&quot;upper left&quot;</span>)</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Enable grid for better readability</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>scatter_one.grid(<span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
@@ -3476,7 +3478,7 @@ vertical-align: -.125em;
 </div>
 </div>
 <p>There is a general inverse relationship between the number of doctors and HIV deaths, with higher doctor density correlating with lower mortality. However, some countries deviate from this trend, suggesting the influence of other factors like epidemic severity.</p>
-<div id="7aafa426" class="cell" data-execution_count="17">
+<div id="c9c69941" class="cell" data-execution_count="17">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select the same 5 countries</span></span>
