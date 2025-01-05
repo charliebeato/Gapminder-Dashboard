@@ -1,0 +1,493 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "---\n",
+        "title: \"Exploring the Relationship Between Healthcare Capacity and HIV Mortality: Two Indicator Approach\"\n",
+        "format: dashboard\n",
+        "theme: superhero\n",
+        "---"
+      ],
+      "id": "84a5c7ea"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "# Load libraries\n",
+        "import pandas as pd\n",
+        "import country_converter as coco\n",
+        "import plotly.express as px\n",
+        "import seaborn as sns\n",
+        "import geopandas as gpd"
+      ],
+      "id": "c3225729",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "First import two raw datasets, each containing estimates per country-year. These data were accessed from the Gapminder foundation, at [www.gapminder.org/data](https://www.gapminder.org/data).\n",
+        "\n",
+        "1. **Annual HIV Deaths Dataset:** This dataset provides the annual number of deaths attributable to HIV/AIDS(*data/annual_hiv_deaths_number_all_ages.csv*).\n",
+        "\n",
+        "2. **Medical Doctors per 1,000 People:** This dataset measures the number of medical doctors per 1,000 people, representing healthcare resource availability at national or subnational levels (*data/medical_doctors_per_1000_people.csv*).\n"
+      ],
+      "id": "d119d6bd"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "# Load raw data \n",
+        "hiv_deaths_raw = pd.read_csv(\"data/annual_hiv_deaths_number_all_ages.csv\")\n",
+        "medical_doctors_raw = pd.read_csv(\"data/medical_doctors_per_1000_people.csv\")\n",
+        "hiv_deaths_raw"
+      ],
+      "id": "9b51f30d",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Data Manipulation\n"
+      ],
+      "id": "ee5bdc99"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#converting to log format\n",
+        "\n",
+        "hiv_deaths_raw_wide = hiv_deaths_raw\n",
+        "\n",
+        "hiv_deaths_long = hiv_deaths_raw_wide.melt(\n",
+        "    id_vars=[\"country\"],\n",
+        "    var_name=\"year\",\n",
+        "    value_name = \"hiv_deaths\"\n",
+        ")"
+      ],
+      "id": "b3b67c9c",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "medical_doctors_raw_wide = medical_doctors_raw\n",
+        "medical_doctors_long = medical_doctors_raw_wide.melt(\n",
+        "    id_vars=[\"country\"], var_name=\"year\", value_name=\"doctors_per_1000\"\n",
+        ")\n",
+        "medical_doctors_long[\"number_of_doctors\"] = (\n",
+        "    medical_doctors_long[\"doctors_per_1000\"] * 1000)"
+      ],
+      "id": "d4db5abb",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "# Convert non-numeric values in 'hiv_deaths' to numeric (e.g., '11k' to 11000)\n",
+        "hiv_deaths_long['hiv_deaths'] = (\n",
+        "    hiv_deaths_long['hiv_deaths']\n",
+        "    .replace(r'[^\\d.]k', lambda x: float(x.group(0).strip('k')) * 1000, regex=True)\n",
+        "    .replace(r'[^\\d.]', '', regex=True)\n",
+        "    .astype(float, errors='ignore')\n",
+        ")"
+      ],
+      "id": "4d499a3b",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "#Convert year to integer and clean numeric columns\n",
+        "hiv_deaths_long['year'] = pd.to_numeric(hiv_deaths_long['year'], errors='coerce')\n",
+        "medical_doctors_long['year'] = pd.to_numeric(medical_doctors_long['year'], errors='coerce')"
+      ],
+      "id": "22bbd2c5",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "# Step 3: Align datasets by filtering overlapping years\n",
+        "common_years = set(hiv_deaths_long['year']).intersection(medical_doctors_long['year'])\n",
+        "hiv_deaths_long = hiv_deaths_long[hiv_deaths_long['year'].isin(common_years)]\n",
+        "medical_doctors_long = medical_doctors_long[medical_doctors_long['year'].isin(common_years)]"
+      ],
+      "id": "ba051ca8",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "# Step 4: Merge datasets on 'country' and 'year'\n",
+        "merged_data = pd.merge(hiv_deaths_long, medical_doctors_long, on=[\"country\", \"year\"], how=\"inner\")\n"
+      ],
+      "id": "d215dec9",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "# Step 5: Drop duplicates and save the cleaned dataset\n",
+        "merged_data = merged_data.drop_duplicates()"
+      ],
+      "id": "82c578dc",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "# Save to a CSV file\n",
+        "merged_data.to_csv('data/cleaned_merged_dataset.csv', index=False)\n",
+        "\n",
+        "# Display a preview of the cleaned and merged dataset\n",
+        "print(merged_data.head())"
+      ],
+      "id": "82afc34a",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "# Visuals\n",
+        "## Line Chart for Annual HIV Deaths\n"
+      ],
+      "id": "cc7ce8ae"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import matplotlib.pyplot as plt\n",
+        "\n",
+        "# Aggregate data for the line chart\n",
+        "annual_hiv_deaths = merged_data.groupby('year')['hiv_deaths'].sum()\n",
+        "\n",
+        "# Create line chart\n",
+        "plt.figure(figsize=(10, 6))\n",
+        "plt.plot(annual_hiv_deaths.index, annual_hiv_deaths.values, marker='o', linestyle='-')\n",
+        "plt.title('Annual HIV Deaths (All Countries)', fontsize=16)\n",
+        "plt.xlabel('Year', fontsize=12)\n",
+        "plt.ylabel('HIV Deaths', fontsize=12)\n",
+        "plt.grid(True)\n",
+        "plt.show()"
+      ],
+      "id": "22e0de35",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "# Value box for country with highest HIV deaths in the most recent year\n",
+        "most_recent_year = merged_data[\"year\"].max()\n",
+        "highest_deaths = merged_data[merged_data[\"year\"] == most_recent_year].sort_values(\"hiv_deaths\", ascending=False).iloc[0]\n",
+        "highest_deaths_country = highest_deaths[\"country\"]\n",
+        "highest_deaths_value = highest_deaths[\"hiv_deaths\"]\n",
+        "f\"Country with the highest HIV deaths in {most_recent_year}: {highest_deaths_country} ({highest_deaths_value} deaths)\""
+      ],
+      "id": "332852b2",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "# Table summarizing statistics for the most recent year\n",
+        "summary_stats = merged_data[merged_data[\"year\"] == most_recent_year][[\"country\", \"hiv_deaths\"]].sort_values(\"hiv_deaths\", ascending=False)\n",
+        "summary_stats.head(10)"
+      ],
+      "id": "d1c93686",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Bar Chart for Medical Doctors"
+      ],
+      "id": "1c375a97"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "# Aggregate data for a specific year (2011))\n",
+        "yearly_data = merged_data[merged_data['year'] == 2011].dropna(subset=['doctors_per_1000'])\n",
+        "\n",
+        "# Sort by doctors_per_1000 for better visualization\n",
+        "yearly_data = yearly_data.sort_values(by='doctors_per_1000', ascending=False).head(10)\n",
+        "\n",
+        "# Create bar chart\n",
+        "plt.figure(figsize=(10, 6))\n",
+        "plt.bar(yearly_data['country'], yearly_data['doctors_per_1000'], color='skyblue')\n",
+        "plt.title('Top 10 Countries by Doctors per 1000 People (2020)', fontsize=16)\n",
+        "plt.xlabel('Country', fontsize=12)\n",
+        "plt.ylabel('Doctors per 1000 People', fontsize=12)\n",
+        "plt.xticks(rotation=45, ha='right')\n",
+        "plt.show()\n"
+      ],
+      "id": "e3f7b8a7",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "# Filter data for the year 2011\n",
+        "data_2011 = merged_data[merged_data['year'] == 2011]\n",
+        "\n",
+        "# Ensure country names match those in the world dataset\n",
+        "# This step may require manual adjustments if there are discrepancies\n",
+        "data_2011['country'] = data_2011['country'].replace({\n",
+        "    'United States': 'United States of America',\n",
+        "    'Russia': 'Russian Federation',\n",
+        "    # Add more replacements as needed\n",
+        "})\n",
+        "\n",
+        "\n",
+        "# Set up the plot\n",
+        "fig, ax = plt.subplots(1, 1, figsize=(15, 10))\n",
+        "\n",
+        "# Plot the data\n",
+        "world.boundary.plot(ax=ax)\n",
+        "world.plot(column='doctors_per_1000', ax=ax, legend=True,\n",
+        "           legend_kwds={'label': \"Doctors per 1,000 People\",\n",
+        "                        'orientation': \"horizontal\"},\n",
+        "           cmap='OrRd', missing_kwds={\"color\": \"lightgrey\"})\n",
+        "\n",
+        "# Add titles and labels\n",
+        "ax.set_title('Global Distribution of Doctors per 1,000 People (2011)', fontsize=16)\n",
+        "ax.set_axis_off()\n",
+        "\n",
+        "# Show the plot\n",
+        "plt.show()"
+      ],
+      "id": "3fe55206",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Scatter Plot for Relationship\n"
+      ],
+      "id": "59e9042e"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import seaborn as sns\n",
+        "\n",
+        "# Create scatter plot\n",
+        "plt.figure(figsize=(10, 6))\n",
+        "sns.scatterplot(data=merged_data, x='doctors_per_1000', y='hiv_deaths', hue='year', palette='viridis')\n",
+        "plt.title('Relationship between Medical Doctors and HIV Deaths', fontsize=16)\n",
+        "plt.xlabel('Doctors per 1000 People', fontsize=12)\n",
+        "plt.ylabel('HIV Deaths', fontsize=12)\n",
+        "plt.legend(title='Year', bbox_to_anchor=(1.05, 1), loc='upper left')\n",
+        "plt.grid(True)\n",
+        "plt.show()"
+      ],
+      "id": "c1db23dc",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import plotly.io as pio\n",
+        "pio.renderers.default = \"notebook\"  # For Jupyter Notebook\n",
+        "# Use \"jupyterlab\" if running in JupyterLab\n",
+        "\n",
+        "\n",
+        "import plotly.io as pio\n",
+        "print(pio.renderers.default)\n"
+      ],
+      "id": "e32d4d63",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Map for Medical Doctors"
+      ],
+      "id": "38171146"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import geopandas as gpd\n",
+        "import plotly.express as px\n",
+        "\n",
+        "# Load the shapefile\n",
+        "world = gpd.read_file(\"data/ne_110m_admin_0_countries.shp\")\n",
+        "\n",
+        "# Merge GeoJSON with medical doctor data for a specific year\n",
+        "map_data = merged_data[merged_data['year'] == 2010].dropna(subset=['doctors_per_1000'])\n",
+        "map_data = world.merge(map_data, left_on='ADMIN', right_on='country', how='left')\n",
+        "\n",
+        "# Create map\n",
+        "fig = px.choropleth(\n",
+        "    map_data,\n",
+        "    geojson=world.__geo_interface__,\n",
+        "    locations='ADMIN',\n",
+        "    color='doctors_per_1000',\n",
+        "    hover_name='ADMIN',\n",
+        "    title='Doctors per 1000 People (2020)',\n",
+        "    color_continuous_scale='Viridis'\n",
+        ")\n",
+        "fig.update_geos(fitbounds=\"locations\", visible=False)\n",
+        "\n",
+        "fig.show(renderer=\"browser\")\n"
+      ],
+      "id": "12fee6ee",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## HeatMap for Medical Doctors\n"
+      ],
+      "id": "033ed63e"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import seaborn as sns\n",
+        "import matplotlib.pyplot as plt\n",
+        "\n",
+        "# Select 5 countries from 5 continents\n",
+        "selected_countries = [\n",
+        "    \"United States\",\n",
+        "    \"Nigeria\",\n",
+        "    \"Brazil\",\n",
+        "    \"Australia\",\n",
+        "    \"India\",\n",
+        "]  # Customize based on your dataset\n",
+        "\n",
+        "# Filter the dataset\n",
+        "filtered_data = merged_data[merged_data[\"country\"].isin(selected_countries)]\n",
+        "\n",
+        "# Prepare data for heatmap\n",
+        "heatmap_data = filtered_data.pivot_table(\n",
+        "    index=\"country\", columns=\"year\", values=\"doctors_per_1000\"\n",
+        ")\n",
+        "\n",
+        "# Plot the heatmap\n",
+        "plt.figure(figsize=(10, 6))\n",
+        "sns.heatmap(\n",
+        "    heatmap_data,\n",
+        "    cmap=\"YlGnBu\",\n",
+        "    cbar_kws={\"label\": \"Doctors per 1000 People\"},\n",
+        "    linewidths=0.5,\n",
+        "    annot=True,\n",
+        "    fmt=\".2f\",  # Annotate cells with data values\n",
+        ")\n",
+        "plt.title(\n",
+        "    \"Heatmap of Medical Doctors Per 1000 People (Selected Countries)\", fontsize=16\n",
+        ")\n",
+        "plt.xlabel(\"Year\", fontsize=12)\n",
+        "plt.ylabel(\"Country\", fontsize=12)\n",
+        "plt.tight_layout()\n",
+        "plt.show()"
+      ],
+      "id": "6142cef3",
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": [
+        "## Scatter Plot for Relationship 5 Countries\n"
+      ],
+      "id": "d2a582e7"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "source": [
+        "import seaborn as sns\n",
+        "import matplotlib.pyplot as plt\n",
+        "\n",
+        "# Select the same 5 countries\n",
+        "selected_countries = ['United States', 'Nigeria', 'Brazil', 'Australia', 'India']\n",
+        "\n",
+        "# Filter the dataset for these countries\n",
+        "filtered_scatter_data = merged_data[merged_data['country'].isin(selected_countries)]\n",
+        "\n",
+        "# Create scatter plot\n",
+        "plt.figure(figsize=(10, 6))\n",
+        "sns.scatterplot(\n",
+        "    data=filtered_scatter_data,\n",
+        "    x='doctors_per_1000',\n",
+        "    y='hiv_deaths',\n",
+        "    hue='country',\n",
+        "    style='country',\n",
+        "    size='year',\n",
+        "    sizes=(50, 200),\n",
+        "    palette='Set2'\n",
+        ")\n",
+        "plt.title('Relationship Between Medical Doctors and HIV Deaths (Selected Countries)', fontsize=16)\n",
+        "plt.xlabel('Doctors per 1000 People', fontsize=12)\n",
+        "plt.ylabel('HIV Deaths', fontsize=12)\n",
+        "plt.legend(title='Country', bbox_to_anchor=(1.05, 1), loc='upper left')\n",
+        "plt.grid(True)\n",
+        "plt.tight_layout()\n",
+        "plt.show()"
+      ],
+      "id": "e12be39e",
+      "execution_count": null,
+      "outputs": []
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python3",
+      "language": "python",
+      "display_name": "Python 3 (ipykernel)",
+      "path": "C:\\Users\\PALCare NG\\Documents\\GitHub\\Gapminder-Dashboard\\.venv\\share\\jupyter\\kernels\\python3"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

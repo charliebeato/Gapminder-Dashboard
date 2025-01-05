@@ -1,0 +1,303 @@
+---
+title: "Statistics Dashboard: HIV Deaths and Medical Doctors"
+author: "Charles O"
+format: 
+    html: 
+        layout: dashboard
+        theme: superhero
+        code-fold: true
+        page-layout: full
+        self-contained: true
+
+    
+---
+
+# Introduction
+This dashboard explores the relationship between **annual HIV deaths** and the availability of **medical doctors per 1000 people**. The goal is to highlight trends, disparities, and possible correlations between these indicators.
+
+The dashboard is divided into three main sections:
+
+1. Annual HIV Deaths.
+2. Medical Doctors per 1000 People.
+3. Relationship Between the Two Indicators.
+
+---
+
+
+
+
+```{python}
+# Load libraries
+import pandas as pd
+import country_converter as coco
+import plotly.express as px
+import seaborn as sns
+import geopandas as gpd
+import matplotlib.pyplot as plt
+```
+
+
+
+Data were accessed from the Gapminder foundation, at [www.gapminder.org/data](https://www.gapminder.org/data).
+
+1. **Annual HIV Deaths Dataset:** This dataset provides the annual number of deaths attributable to HIV/AIDS
+
+2. **Medical Doctors per 1,000 People:** This dataset measures the number of medical doctors per 1,000 people, representing healthcare resource availability at national or subnational levels 
+
+
+
+```{python}
+# Load raw data 
+hiv_deaths_raw = pd.read_csv("data/annual_hiv_deaths_number_all_ages.csv")
+medical_doctors_raw = pd.read_csv("data/medical_doctors_per_1000_people.csv")
+```
+
+```{python}
+# converting to log format
+
+hiv_deaths_raw_wide = hiv_deaths_raw
+
+hiv_deaths_long = hiv_deaths_raw_wide.melt(
+    id_vars=["country"], var_name="year", value_name="hiv_deaths"
+)
+
+```
+
+```{python}
+medical_doctors_raw_wide = medical_doctors_raw
+medical_doctors_long = medical_doctors_raw_wide.melt(
+    id_vars=["country"],
+    var_name="year",
+    value_name = "doctors_per_1000"
+)
+medical_doctors_long['number_of_doctors'] = medical_doctors_long['doctors_per_1000'] * 1000
+
+
+```
+
+
+```{python}
+# Convert non-numeric values in 'hiv_deaths' to numeric (e.g., '11k' to 11000)
+hiv_deaths_long['hiv_deaths'] = (
+    hiv_deaths_long['hiv_deaths']
+    .replace(r'[^\d.]k', lambda x: float(x.group(0).strip('k')) * 1000, regex=True)
+    .replace(r'[^\d.]', '', regex=True)
+    .astype(float, errors='ignore')
+)
+
+```
+
+```{python}
+#Convert year to integer and clean numeric columns
+hiv_deaths_long['year'] = pd.to_numeric(hiv_deaths_long['year'], errors='coerce')
+medical_doctors_long['year'] = pd.to_numeric(medical_doctors_long['year'], errors='coerce')
+```
+
+
+
+```{python}
+# Step 3: Align datasets by filtering overlapping years
+common_years = set(hiv_deaths_long['year']).intersection(medical_doctors_long['year'])
+hiv_deaths_long = hiv_deaths_long[hiv_deaths_long['year'].isin(common_years)]
+medical_doctors_long = medical_doctors_long[medical_doctors_long['year'].isin(common_years)]
+```
+
+
+
+```{python}
+# Step 4: Merge datasets on 'country' and 'year'
+merged_data = pd.merge(hiv_deaths_long, medical_doctors_long, on=["country", "year"], how="inner")
+
+
+```
+
+
+```{python}
+# Step 5: Drop duplicates and save the cleaned dataset
+merged_data = merged_data.drop_duplicates()
+```
+
+
+```{python}
+# Save to a CSV file
+merged_data.to_csv("data/cleaned_merged_dataset.csv", index=False)
+
+# Display a preview of the cleaned and merged dataset
+```
+
+
+
+# Annual HIV Deaths
+
+## {height="50%"}
+
+
+```{python}
+# Value box for country with highest HIV deaths in the most recent year
+most_recent_year = merged_data["year"].max()
+highest_deaths = merged_data[merged_data["year"] == most_recent_year].sort_values("hiv_deaths", ascending=False).iloc[0]
+highest_deaths_country = highest_deaths["country"]
+highest_deaths_value = highest_deaths["hiv_deaths"]
+```
+
+
+### {width="50%"}
+:::{.valuebox title= "COLOMBIA" color="primary" icon= "heart"}
+9700
+
+DEATHS in 2011
+:::
+
+### {width="100%"}
+
+```{python}
+# Table summarizing statistics for the most recent year
+summary_stats = merged_data[merged_data["year"] == most_recent_year][["country", "hiv_deaths"]].sort_values("hiv_deaths", ascending=False)
+summary_stats.head(10)
+```
+
+## Trends in Annual HIV Deaths {height="50%"}
+```{python}
+# Aggregate data for the line chart
+annual_hiv_deaths = merged_data.groupby("year")["hiv_deaths"].sum()
+# Create line chart
+plt.figure(figsize=(10, 6))
+plt.plot(annual_hiv_deaths.index, annual_hiv_deaths.values, marker="o", linestyle="-")
+plt.title("Annual HIV Deaths (All Countries)", fontsize=16)
+plt.xlabel("Year", fontsize=12)
+plt.ylabel("HIV Deaths", fontsize=12)
+plt.grid(True)
+plt.show()
+
+```
+
+The global HIV mortality rate increased steadily from 1990 to the mid-2000s, peaking around 2005. However, there was a dramatic decline after 2005, reflecting global efforts in HIV prevention and treatment
+
+
+# Medical Doctors per 1000 People
+
+## Top 10 Countries by Doctors per 1000 People
+```{python}
+# Aggregate data for a specific year (2011))
+yearly_data = merged_data[merged_data['year'] == 2011].dropna(subset=['doctors_per_1000'])
+
+# Sort by doctors_per_1000 for better visualization
+yearly_data = yearly_data.sort_values(by='doctors_per_1000', ascending=False).head(10)
+
+# Create bar chart
+plt.figure(figsize=(10, 6))
+plt.bar(yearly_data['country'], yearly_data['doctors_per_1000'], color='skyblue')
+plt.title('Top 10 Countries by Doctors per 1000 People (2011)', fontsize=16)
+plt.xlabel('Country', fontsize=12)
+plt.ylabel('Doctors per 1000 People', fontsize=12)
+plt.xticks(rotation=45, ha='right')
+plt.show()
+
+```
+
+Cuba leads with the highest number of doctors per 1000 people, followed by Greece and Austria. This demonstrates significant disparities in healthcare resources between countries, likely impacting healthcare outcomes
+
+##  Heatmap for 5 Countries by Doctors per 1000 People
+
+
+```{python}
+# Select 5 countries from 5 continents
+selected_countries = [
+    "United States",
+    "Nigeria",
+    "Brazil",
+    "Australia",
+    "India",
+]  # Customize based on your dataset
+
+# Filter the dataset
+filtered_data = merged_data[merged_data["country"].isin(selected_countries)]
+
+# Prepare data for heatmap
+heatmap_data = filtered_data.pivot_table(
+    index="country", columns="year", values="doctors_per_1000"
+)
+
+# Plot the heatmap
+plt.figure(figsize=(10, 6))
+sns.heatmap(
+    heatmap_data,
+    cmap="YlGnBu",
+    cbar_kws={"label": "Doctors per 1000 People"},
+    linewidths=0.5,
+    annot=True,
+    fmt=".2f",  # Annotate cells with data values
+)
+plt.title(
+    "Heatmap of Medical Doctors Per 1000 People (Selected Countries)", fontsize=16
+)
+plt.xlabel("Year", fontsize=12)
+plt.ylabel("Country", fontsize=12)
+plt.tight_layout()
+plt.show()
+```
+
+
+Australia consistently shows high levels of doctors per 1000 people over the years, while Nigeria exhibits significantly lower levels. This disparity highlights the challenges of healthcare accessibility in resource-constrained settings like Nigeria.
+
+#  Relationship Between HIV Deaths and Medical Doctors
+
+```{python}
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Create the scatter plot and assign it to scatter_one
+scatter_one = sns.scatterplot(
+    data=merged_data,
+    x="doctors_per_1000",
+    y="hiv_deaths",
+    hue="year",
+    palette="viridis",
+)
+
+# Set plot title and labels
+scatter_one.set_title("Relationship between Medical Doctors and HIV Deaths", fontsize=16)
+scatter_one.set_xlabel("Doctors per 1000 People", fontsize=12)
+scatter_one.set_ylabel("HIV Deaths", fontsize=12)
+
+# Adjust legend position
+scatter_one.legend(title="Year", bbox_to_anchor=(1.05, 1), loc="upper left")
+
+# Enable grid for better readability
+scatter_one.grid(True)
+
+
+```
+
+There is a general inverse relationship between the number of doctors and HIV deaths, with higher doctor density correlating with lower mortality. However, some countries deviate from this trend, suggesting the influence of other factors like epidemic severity.
+
+
+```{python}
+# Select the same 5 countries
+selected_countries = ['United States', 'Nigeria', 'Brazil', 'Australia', 'India']
+
+# Filter the dataset for these countries
+filtered_scatter_data = merged_data[merged_data['country'].isin(selected_countries)]
+
+# Create scatter plot
+plt.figure(figsize=(10, 6))
+sns.scatterplot(
+    data=filtered_scatter_data,
+    x='doctors_per_1000',
+    y='hiv_deaths',
+    hue='country',
+    style='country',
+    size='year',
+    sizes=(50, 200),
+    palette='Set2'
+)
+plt.title('Relationship Between Medical Doctors and HIV Deaths (Selected Countries)', fontsize=16)
+plt.xlabel('Doctors per 1000 People', fontsize=12)
+plt.ylabel('HIV Deaths', fontsize=12)
+plt.legend(title='Country', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+```
+
+Among selected countries, Brazil shows higher HIV deaths despite moderate doctor density, while Australia consistently maintains low deaths with high doctor availability. This reflects the impact of healthcare infrastructure and epidemic management strategies.
